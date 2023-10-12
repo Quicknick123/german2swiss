@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "german-to-swiss"
+version = "0.1.0"
+description = "A library to convert text written in high german in text written in Swiss."
+authors = ["Nicolay Gerold <nicolay.gerold@tum.de>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "german_to_swiss"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+bs4 = "^0.0.1"
+requests = "^2.31.0"
+selenium = "^4.14.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.25.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
