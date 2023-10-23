@@ -5,7 +5,7 @@ description = "A library to convert text written in high german in text written 
 authors = ["Nicolay Gerold <nicolay.gerold@tum.de>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "german_to_swiss"}]
+packages = [{include = "german2swiss"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
