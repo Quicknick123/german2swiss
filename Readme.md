@@ -43,17 +43,21 @@ A comprehensive function that applies multiple formatting and conversion functio
 
 ## How to Use
 
-1. **Import the Library**
-   ```python
-   import text_formatting_lib as tf
-   ```
+gh repo clone Quicknick123/german2swiss
+cd german2swiss
+poetry install
 
-2. **Apply Desired Formatting**
-   ```python
-   text = "Your input text here"
-   formatted_text = tf.adapt_text_handler(text)
-   print(formatted_text)
-   ```
+If you are using pip: 
+gh repo clone Quicknick123/german2swiss
+cd german2swiss
+poetry export -f requirements.txt --output requirements.txt
+pip install -r requirements.txt
+
+Now you can import the library into your Python script:
+
+```python
+from german2swiss import *
+```
 
 ## Dependencies
 
