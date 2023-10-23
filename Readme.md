@@ -51,7 +51,8 @@ If you are using pip:
 gh repo clone Quicknick123/german2swiss
 cd german2swiss
 poetry export -f requirements.txt --output requirements.txt
-pip install -r requirements.txt
+cd ..
+pip install -r german2swiss/requirements.txt
 
 Now you can import the library into your Python script:
 

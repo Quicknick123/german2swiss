@@ -1,5 +1,6 @@
 
 import re
+import os
 from typing import Set
 import pickle
 
@@ -113,12 +114,20 @@ def convert_words(text: str) -> str:
     Returns:
         str: The formatted text with German words substituted with Swiss words.
     """
-    with open('swiss_vocab.pkl', 'rb') as f:
+    # Get the current file's directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Construct the absolute path to the swiss_vocab.pickle file
+    vocab_file = os.path.join(current_dir, 'swiss_vocab.pickle')
+
+    # Load the vocabulary from the pickle file
+    with open(vocab_file, 'rb') as f:
         vocab = pickle.load(f)
-    
-    translation_table = str.maketrans(vocab)
-    text = text.translate(translation_table)
-    
+        
+    for key, value in vocab.items():
+        pattern = r'\t' + re.escape(key) + r'\t'
+        text = re.sub(pattern, '\t' + value + '\t', text)
+
     return text
 
 def adapt_text_handler(text: str) -> str:
@@ -131,9 +140,9 @@ def adapt_text_handler(text: str) -> str:
         str: The formatted text with the appropriate substitutions.
     """
     text = replace_quotes(text)
-    text = format_time(text)
     text = format_currency_handler(text)
     text = convert_esszett(text)
     text = convert_words(text)
+    text = format_time(text)
     
     return text
