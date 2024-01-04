@@ -23,7 +23,7 @@ def standardize_number_in_text(text: str) -> str:
     
     return standardized_str
 
-def swiss_number_format(text: str) -> str:
+def swiss_number_format(number: str) -> str:
     """The swiss_number_format function is a Python function that takes a string representing a number as input and returns the same number formatted with a Swiss number format. The function should work for numbers with or without decimal places. The function should not change the number if it is less than 4 digits long.
     
     Args:
@@ -31,7 +31,16 @@ def swiss_number_format(text: str) -> str:
         
     Returns:
         str: The formatted text with the Swiss number format."""
-    return re.sub(r'(\d)(?=(\d{3})+(?!\d))', r'\1\'', text)
+    # Remove any existing thousand separators
+    number = number.replace("'", "")
+    number = number.replace(",", "")
+
+    # Add the Swiss thousand separator
+    number = number[::-1]
+    number = "'".join(number[i:i+3] for i in range(0, len(number), 3))
+    number = number[::-1]
+
+    return number
 
 def format_currency(text: str, currency_symbols: Set[str] = {"EUR", "USD", "€", "$", "CHF"}) -> str:
     """The format_currency function is used to format currency values in a given text by adding the appropriate currency symbol and decimal point if necessary.
@@ -51,6 +60,9 @@ def format_currency(text: str, currency_symbols: Set[str] = {"EUR", "USD", "€"
             number = match_after.group(2)
             if '.' not in number:
                 number += '.-'
+            number_parts = number.split('.')
+            number_parts[0] = swiss_number_format(number_parts[0])
+            number = '.'.join(number_parts)
             text = re.sub(pattern_after, symbol + ' ' + number, text)
         
         # For symbol before the number
@@ -59,6 +71,9 @@ def format_currency(text: str, currency_symbols: Set[str] = {"EUR", "USD", "€"
             number = match_before.group(1)
             if '.' not in number:
                 number += '.-'
+            number_parts = number.split('.')
+            number_parts[0] = swiss_number_format(number_parts[0])
+            number = '.'.join(number_parts)
             text = re.sub(pattern_before, symbol + ' ' + number, text)
     
     return text
@@ -70,7 +85,13 @@ def replace_quotes(text: str) -> str:
     
     Returns:
         str: The formatted text with the double quotation marks replaced by angled quotation marks."""
-    return re.sub(r'“(.+?)”', r'«\1»', text)
+    # Replace straight double quotes and German-style quotes
+    text = re.sub(r'"(.*?)"', r'«\1»', text)
+    text = re.sub(r'„(.*?)“', r'«\1»', text)
+    
+    # Replace single quotes if they appear in pairs (assuming they are used as quotation marks)
+    text = re.sub(r"'(.*?)'", r'«\1»', text)
+    return text
     
 def format_time(text: str) -> str:
     """The time_format function uses regular expressions to replace occurrences of time in the format "HH:MM" with "HH.MM".
@@ -91,7 +112,6 @@ def format_currency_handler(text: str) -> str:
         str: The formatted text with the standardized currency format."""
     text = standardize_number_in_text(text)
     text = format_currency(text)
-    text = swiss_number_format(text)
     return text
     
 def convert_esszett(text: str) -> str:
@@ -130,7 +150,18 @@ def convert_words(text: str) -> str:
 
     return text
 
-def adapt_text_handler(text: str) -> str:
+def replace_apostrophes(text: str) -> str:
+    """The replace_apostrophes function is a Python function that takes a string as input and replaces all occurrences of the German apostrophe (’) with the equivalent Italian apostrophe (').
+
+    Args:
+        text (str): The input text to be formatted.
+
+    Returns:
+        str: The formatted text with the apostrophes substituted.
+    """
+    return re.sub(r'’', "'", text)
+
+def adapt_text_handler(text: str, language: str = "swiss") -> str:
     """The adapt_text_handler function is a Python function that takes a string as input and applies the following functions to the text in the following order: replace_quotes, format_time, format_currency_handler, convert_esszett, and convert_words.
 
     Args:
@@ -139,10 +170,14 @@ def adapt_text_handler(text: str) -> str:
     Returns:
         str: The formatted text with the appropriate substitutions.
     """
-    text = replace_quotes(text)
-    text = format_currency_handler(text)
-    text = convert_esszett(text)
-    text = convert_words(text)
-    text = format_time(text)
+    if language == "swiss":
+        text = replace_quotes(text)
+        text = format_currency_handler(text)
+        text = convert_esszett(text)
+        text = convert_words(text)
+        text = format_time(text)
+    if language == "italian":
+        text = replace_apostrophes(text)
     
     return text
+
